@@ -11,7 +11,9 @@
   },
   "author": "Mohammed Ismail Ansari <team.terminal@gmail.com>",
   "permissions": [
-    "bookmarks"
+    "bookmarks",
+    "history",
+    "storage"
   ],
   "chrome_url_overrides": {
     "newtab": "index.html"

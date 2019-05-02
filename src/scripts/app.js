@@ -5,7 +5,68 @@ import '../styles/styles.less';
 const packageDetails = require('../../package.json');
 
 const load = function () {
-    document.querySelector('#title').innerText = `Chrome Live Bookmarks ${packageDetails.version}`;
+    const titleDom = document.querySelector('#title');
+    const bookmarksDom = document.querySelector('#bookmarks');
+
+    let bookmarkNodes = [];
+    let urlBookmarks = [];
+    let recentVisitedBookmarks = [];
+
+    titleDom.innerText = `Chrome Live Bookmarks ${packageDetails.version}`;
+
+    chrome.bookmarks.getTree(tree => {
+        bookmarkNodes = flattenTree(tree[0]);
+        urlBookmarks = bookmarkNodes.filter(n => n.url && n.url !== 'chrome://bookmarks/');
+
+        chrome.history.search(
+            {
+                text: '',
+                maxResults: 50
+            },
+            items => {
+                recentVisitedBookmarks = items
+                    .filter(
+                        i => urlBookmarks
+                            .filter(
+                                u => u.url.indexOf(i.url) > -1
+                            )
+                            .length
+                    );
+
+                renderBookmarks(bookmarksDom, recentVisitedBookmarks);
+            }
+        );
+    });
+};
+
+const flattenTree = node =>
+    [node]
+        .concat(
+            node.children
+                ? node.children.map(
+                    n => flattenTree(n)
+                ).reduce(
+                    (a, c) => a.concat(c),
+                    []
+                )
+                : []
+        );
+
+const renderBookmarks = (domElement, bookmarks) => {
+    domElement.innerHTML += bookmarks
+        .sort((a, b) => {
+            if (a.visitCount < b.visitCount) {
+                return 1;
+            } else if (a.visitCount > b.visitCount) {
+                return -1;
+            } else {
+                return 0;
+            }
+        })
+        .map(
+            b => `<a class='recent-bookmark' href=${b.url}>${b.title}</a><br />`
+        )
+        .join('');
 };
 
 window.addEventListener('load', load);
