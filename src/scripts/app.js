@@ -6,10 +6,12 @@ const packageDetails = require('../../package.json');
 
 const load = function () {
     const titleDom = document.querySelector('#title');
+    const bookmarksBarDom = document.querySelector('#bookmarks-bar');
     const bookmarksDom = document.querySelector('#bookmarks');
 
     let bookmarkNodes = [];
     let urlBookmarks = [];
+    let bookmarksBarBookmarks = [];
     let recentVisitedBookmarks = [];
 
     titleDom.innerText = `Chrome Live Bookmarks ${packageDetails.version}`;
@@ -17,6 +19,9 @@ const load = function () {
     chrome.bookmarks.getTree(tree => {
         bookmarkNodes = flattenTree(tree[0]);
         urlBookmarks = bookmarkNodes.filter(n => n.url && n.url !== 'chrome://bookmarks/');
+        bookmarksBarBookmarks = urlBookmarks.filter(n => n.parentId === '1');
+
+        renderUrlBookmarks(bookmarksBarDom, bookmarksBarBookmarks);
 
         chrome.history.search(
             {
@@ -33,7 +38,7 @@ const load = function () {
                             .length
                     );
 
-                renderBookmarks(bookmarksDom, recentVisitedBookmarks);
+                renderUrlBookmarks(bookmarksDom, recentVisitedBookmarks);
             }
         );
     });
@@ -52,7 +57,7 @@ const flattenTree = node =>
                 : []
         );
 
-const renderBookmarks = (domElement, bookmarks) => {
+const renderUrlBookmarks = (domElement, bookmarks) => {
     domElement.innerHTML += bookmarks
         .sort((a, b) => {
             if (a.visitCount < b.visitCount) {
@@ -64,7 +69,7 @@ const renderBookmarks = (domElement, bookmarks) => {
             }
         })
         .map(
-            b => `<a class='recent-bookmark' href=${b.url}>${b.title}</a><br />`
+            b => `<a class="recent-bookmark" href="${b.url}">${b.title}</a><br />`
         )
         .join('');
 };
