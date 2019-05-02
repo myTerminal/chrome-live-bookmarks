@@ -29,12 +29,10 @@ const load = function () {
                 maxResults: 50
             },
             items => {
-                recentVisitedBookmarks = items
+                recentVisitedBookmarks = urlBookmarks
                     .filter(
-                        i => urlBookmarks
-                            .filter(
-                                u => u.url.indexOf(i.url) > -1
-                            )
+                        u => items
+                            .filter(i => i.url.indexOf(u.url) > -1)
                             .length
                     );
 
