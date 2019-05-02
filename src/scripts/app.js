@@ -7,7 +7,7 @@ const packageDetails = require('../../package.json');
 const load = function () {
     const titleDom = document.querySelector('#title');
     const bookmarksBarDom = document.querySelector('#bookmarks-bar');
-    const bookmarksDom = document.querySelector('#bookmarks');
+    const bookmarksDom = document.querySelector('#all-bookmarks');
 
     let bookmarkNodes = [];
     let urlBookmarks = [];
@@ -69,7 +69,7 @@ const renderUrlBookmarks = (domElement, bookmarks) => {
             }
         })
         .map(
-            b => `<a class="recent-bookmark" href="${b.url}">${b.title}</a><br />`
+            b => `<div class="bookmark-item"><a href="${b.url}">${b.title}</a></div>`
         )
         .join('');
 };
