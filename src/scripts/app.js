@@ -56,6 +56,10 @@ const flattenTree = node =>
         );
 
 const renderUrlBookmarks = (domElement, bookmarks) => {
+    if (!bookmarks.length) {
+        return;
+    }
+
     domElement.innerHTML += bookmarks
         .sort((a, b) => {
             if (a.visitCount < b.visitCount) {
