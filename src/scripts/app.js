@@ -60,7 +60,7 @@ const renderUrlBookmarks = (domElement, bookmarks) => {
         return;
     }
 
-    domElement.innerHTML += bookmarks
+    domElement.innerHTML = bookmarks
         .sort((a, b) => {
             if (a.visitCount < b.visitCount) {
                 return 1;
