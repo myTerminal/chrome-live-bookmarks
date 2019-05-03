@@ -6,8 +6,8 @@ const packageDetails = require('../../package.json');
 
 const load = function () {
     const titleDom = document.querySelector('#title');
-    const bookmarksBarDom = document.querySelector('#bookmarks-bar');
-    const bookmarksDom = document.querySelector('#all-bookmarks');
+    const bookmarksBarDom = document.querySelector('#bookmarks-bar .items');
+    const bookmarksDom = document.querySelector('#all-bookmarks .items');
 
     let bookmarkNodes = [];
     let urlBookmarks = [];
@@ -67,7 +67,7 @@ const renderUrlBookmarks = (domElement, bookmarks) => {
             }
         })
         .map(
-            b => `<div class="bookmark-item"><a href="${b.url}">${b.title}</a></div>`
+            b => `<div class="bookmark-item"><a href="${b.url}" title="${b.url}">${b.title}</a></div>`
         )
         .join('');
 };

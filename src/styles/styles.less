@@ -21,5 +21,74 @@ html {
         margin: 0;
         padding: 0;
         font-family: OpenSans;
+        font-size: 14px;
+
+        #title {
+            margin-bottom: 10px;
+            padding: 5px;
+            text-align: center;
+            background-color: #444;
+            color: #fff;
+            box-shadow: 0 0 10px #000;
+        }
+
+        .section {
+            margin: 5px 5px 15px 5px;
+
+            .header {
+                margin-bottom: 5px;
+                font-size: 1.3em;
+            }
+
+            .items {
+
+                .bookmark-item {
+                    cursor: pointer;
+
+                    a,
+                    a:visited,
+                    a:hover {
+                        color: #000;
+                        text-decoration: none;
+                    }
+                }
+            }
+        }
+
+        #bookmarks-bar {
+
+            .items {
+
+                .bookmark-item {
+                    display: inline-block;
+                    margin: 5px;
+                    padding: 5px;
+                    .round-borders(5px);
+                    background-color: #ddd;
+                    box-shadow: 0 0 #000 3px;
+
+                    &:hover {
+                        background-color: #eee;
+                    }
+                }
+            }
+        }
+
+        #all-bookmarks {
+
+            .items {
+
+                .bookmark-item {
+                    .box-sizing(border-box);
+                    margin-bottom: 5px;
+                    padding: 5px;
+                    background-color: #ddd;
+
+                    &:hover {
+                        background-color: #eee;
+                    }
+                }
+            }
+        }
     }
 }
