@@ -26,7 +26,7 @@ const load = function () {
         chrome.history.search(
             {
                 text: '',
-                maxResults: 50
+                maxResults: 100
             },
             items => {
                 recentVisitedBookmarks = urlBookmarks

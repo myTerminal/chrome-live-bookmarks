@@ -37,19 +37,27 @@ html {
 
             .header {
                 margin-bottom: 5px;
-                font-size: 1.3em;
+                font-size: 1.2em;
             }
 
             .items {
 
                 .bookmark-item {
                     cursor: pointer;
+                    background-color: #ddd;
+                    border: 1px solid #ccc;
 
                     a,
                     a:visited,
-                    a:hover {
+                    a:hover,
+                    a:active {
                         color: #000;
                         text-decoration: none;
+                    }
+
+                    &:hover {
+                        background-color: #eee;
+                        border-color: #bbb;
                     }
                 }
             }
@@ -64,12 +72,6 @@ html {
                     margin: 5px;
                     padding: 5px;
                     .round-borders(5px);
-                    background-color: #ddd;
-                    box-shadow: 0 0 #000 3px;
-
-                    &:hover {
-                        background-color: #eee;
-                    }
                 }
             }
         }
@@ -82,11 +84,7 @@ html {
                     .box-sizing(border-box);
                     margin-bottom: 5px;
                     padding: 5px;
-                    background-color: #ddd;
-
-                    &:hover {
-                        background-color: #eee;
-                    }
+                    .round-borders(2px);
                 }
             }
         }
