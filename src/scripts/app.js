@@ -80,7 +80,7 @@ const renderUrlItems = (domElement, items, type, shouldAppend) => {
         })
         .filter(i => i.title && i.url)
         .map(
-            b => `<div class="${type === itemType.bookmark ? 'bookmark-item' : 'history-item'}"><a href="${b.url}" title="${b.url}">${b.title}</a></div>`
+            b => `<div class="${type === itemType.bookmark ? 'bookmark-item' : 'history-item'}"><a href="${b.url}" title="${b.url}"><span class="title">${b.title}</span><span class="url">&nbsp;[${b.url}]</span></a></div>`
         )
         .join('');
 
