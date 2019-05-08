@@ -45,6 +45,8 @@ const load = function () {
 
                 renderUrlItems(bookmarksDom, recentVisitedBookmarks, itemType.bookmark);
                 renderUrlItems(bookmarksDom, recentlyHistoryItems, itemType.history, true);
+
+                applyScalingToBookmarks(bookmarksDom);
             }
         );
     });
@@ -89,6 +91,16 @@ const renderUrlItems = (domElement, items, type, shouldAppend) => {
     } else {
         domElement.innerHTML = itemsDomString;
     }
+};
+
+const applyScalingToBookmarks = parentDom => {
+    const items = parentDom.querySelectorAll('.bookmark-item'),
+        maxScale = 2,
+        scaleDelta = (maxScale - 1) / items.length;
+
+    items.forEach((t, i) => {
+        t.style.fontSize = (scaleDelta * (items.length - i) + 1) + 'em';
+    });
 };
 
 const itemType = {
