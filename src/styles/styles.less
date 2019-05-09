@@ -13,10 +13,6 @@
 
 html {
 
-    .clearfix {
-        clear: both;
-    }
-
     body {
         margin: 0;
         padding: 0;
@@ -27,15 +23,26 @@ html {
             margin-bottom: 10px;
             padding: 5px;
             text-align: center;
-            background-color: #444;
-            color: #fff;
-            box-shadow: 0 0 10px #000;
+
+            #title-text {
+                font-weight: bold;
+            }
 
             #color-theme {
                 position: absolute;
                 top: 0;
                 right: 0;
                 margin: 5px;
+                cursor: pointer;
+                .opacity(0.7);
+
+                &::before {
+                    content: 'Theme: ';
+                }
+
+                &:hover {
+                    .opacity(1);
+                }
             }
         }
 
@@ -52,20 +59,12 @@ html {
                 .bookmark-item,
                 .history-item {
                     cursor: pointer;
-                    background-color: #ddd;
-                    border: 1px solid #ccc;
 
                     a,
                     a:visited,
                     a:hover,
                     a:active {
-                        color: #000;
                         text-decoration: none;
-                    }
-
-                    &:hover {
-                        background-color: #eee;
-                        border-color: #bbb;
                     }
 
                     .title {
@@ -114,6 +113,128 @@ html {
                     margin-bottom: 5px;
                     padding: 5px;
                     .round-borders(2px);
+                }
+            }
+        }
+
+        &.light {
+            background-color: #fff;
+
+            #title {
+                background-color: #eee;
+                color: #333;
+                border-bottom: 2px solid #999;
+            }
+
+            .section {
+
+                .header {
+                    color: #000;
+                }
+
+                .items {
+
+                    .bookmark-item,
+                    .history-item {
+                        background-color: #ddd;
+                        border: 1px solid #bbb;
+
+                        a,
+                        a:visited,
+                        a:hover,
+                        a:active {
+                            color: #000;
+                        }
+
+                        &:hover {
+                            background-color: #88f;
+                        }
+                    }
+                }
+            }
+
+            #bookmarks-bar {
+
+                .items {
+
+                    .bookmark-item {
+
+                        .url {
+
+                        }
+                    }
+                }
+            }
+
+            #all-bookmarks {
+
+                .items {
+
+                    .bookmark-item,
+                    .history-item {
+
+                    }
+                }
+            }
+        }
+
+        &.dark {
+            background-color: #000;
+
+            #title {
+                background-color: #444;
+                color: #fff;
+                border-bottom: 2px solid #666;
+            }
+
+            .section {
+
+                .header {
+                    color: #fff;
+                }
+
+                .items {
+
+                    .bookmark-item,
+                    .history-item {
+                        background-color: #333;
+                        border: 1px solid #666;
+
+                        a,
+                        a:visited,
+                        a:hover,
+                        a:active {
+                            color: #fff;
+                        }
+
+                        &:hover {
+                            background-color: #88f;
+                        }
+                    }
+                }
+            }
+
+            #bookmarks-bar {
+
+                .items {
+
+                    .bookmark-item {
+
+                        .url {
+
+                        }
+                    }
+                }
+            }
+
+            #all-bookmarks {
+
+                .items {
+
+                    .bookmark-item,
+                    .history-item {
+
+                    }
                 }
             }
         }
