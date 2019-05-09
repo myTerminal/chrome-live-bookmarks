@@ -1,11 +1,12 @@
 /* global require chrome window document */
 
 import { ItemTypes, ColorThemes, StorageKeys } from './constants';
+import { get, load, set } from './preferences';
 import '../styles/styles.less';
 
 const packageDetails = require('../../package.json');
 
-const load = () => {
+const start = () => {
     // Get reference to DOM elements
     const titleDom = document.querySelector('#title #title-text'),
         bookmarksBarDom = document.querySelector('#bookmarks-bar .items'),
@@ -23,17 +24,17 @@ const load = () => {
     titleDom.innerText = `Chrome Live Bookmarks ${packageDetails.version}`;
 
     // Load color-theme
-    preferenceGetters[StorageKeys.COLORTHEME](preferenceLoaders[StorageKeys.COLORTHEME]);
+    get[StorageKeys.COLORTHEME](load[StorageKeys.COLORTHEME]);
 
     // Set listener to color-theme changer
     colorThemeSwitcher.onclick = () => {
-        preferenceGetters[StorageKeys.COLORTHEME](
+        get[StorageKeys.COLORTHEME](
             currentColorTheme => {
                 const projectedColorTheme = currentColorTheme === ColorThemes.LIGHT
                     ? ColorThemes.DARK
                     : ColorThemes.LIGHT;
 
-                preferenceSetters[StorageKeys.COLORTHEME](projectedColorTheme);
+                set[StorageKeys.COLORTHEME](projectedColorTheme);
             }
         );
     };
@@ -143,53 +144,14 @@ const applyScalingToBookmarks = parentDom => {
     });
 };
 
-// Preference fetchers
-const preferenceGetters = {
-    [StorageKeys.COLORTHEME]: onDone => {
-        chrome.storage.sync.get(
-            [
-                StorageKeys.COLORTHEME
-            ],
-            values => {
-                onDone(values[StorageKeys.COLORTHEME] || ColorThemes.LIGHT);
-            }
-        );
-    }
-};
-
-// Preference loaders
-const preferenceLoaders = {
-    [StorageKeys.COLORTHEME]: value => {
-        const bodyDom = document.body;
-
-        bodyDom.className = bodyDom.className
-            .replace(/(light|dark)/, '')
-            + value;
-
-        document.querySelector('#color-theme').innerText = value;
-    }
-};
-
-// Preference setters
-const preferenceSetters = {
-    [StorageKeys.COLORTHEME]: (value, onDone) => {
-        chrome.storage.sync.set(
-            {
-                [StorageKeys.COLORTHEME]: value
-            },
-            onDone
-        );
-    }
-};
-
 // Listen to changes to preferences
 chrome.storage.sync.onChanged.addListener(
     values => {
         Object.keys(values)
             .forEach(
                 k => {
-                    if (preferenceLoaders[k]) {
-                        preferenceLoaders[k](values[k].newValue);
+                    if (load[k]) {
+                        load[k](values[k].newValue);
                     }
                 }
             );
@@ -197,4 +159,4 @@ chrome.storage.sync.onChanged.addListener(
 );
 
 // Start rendering the page
-window.addEventListener('load', load);
+window.addEventListener('load', start);
