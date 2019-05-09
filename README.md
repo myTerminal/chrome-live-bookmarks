@@ -8,4 +8,16 @@
 [![peer Dependency Status](https://david-dm.org/myTerminal/chrome-live-bookmarks/peer-status.svg)](https://david-dm.org/myTerminal/chrome-live-bookmarks#info=peerDependencies)  
 [![License](https://img.shields.io/badge/LICENSE-GPL%20v3.0-blue.svg)](https://www.gnu.org/licenses/gpl.html)
 
-A smarter New Tab replacement for Google Chrome with easy access to most frequently visited bookmarks [in progress]
+A smarter New Tab replacement for Google Chrome with easy access to most frequently visited bookmarks
+
+## Features
+
+* Replaces the default 'New Tab' page with an opinionatedly better implementation that combines bookmarks with history
+* Supports light and dark color-themes
+* More to come...
+
+## To-do
+
+* Also show bookmarks that are not on the bookmarks bar
+* Add option to modify the list
+* Improve visuals
