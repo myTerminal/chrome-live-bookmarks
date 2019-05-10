@@ -61,10 +61,10 @@ const start = () => {
             },
             items => {
                 // Determine recently visited bookmarks
-                recentVisitedBookmarks = urlBookmarks
+                recentVisitedBookmarks = items
                     .filter(
-                        u => items
-                            .filter(i => i.url.indexOf(u.url) > -1)
+                        i => urlBookmarks
+                            .filter(u => i.url.indexOf(u.url) > -1)
                             .length
                     );
 
