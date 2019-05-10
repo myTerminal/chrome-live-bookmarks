@@ -1,4 +1,4 @@
-/* global require chrome window document */
+/* global require process chrome window document */
 
 import { ItemTypes, ColorThemes, StorageKeys } from './constants';
 import { get, load, set } from './preferences';
@@ -21,7 +21,7 @@ const start = () => {
         recentlyHistoryItems = [];
 
     // Set the title
-    titleDom.innerText = `Chrome Live Bookmarks ${packageDetails.version}`;
+    titleDom.innerText = `Chrome Live Bookmarks ${packageDetails.version}${process.env.NODE_ENV === 'development' ? ' [DEBUG]' : ''}`;
 
     // Load color-theme
     get[StorageKeys.COLORTHEME](load[StorageKeys.COLORTHEME]);
