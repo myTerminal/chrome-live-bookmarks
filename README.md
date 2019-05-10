@@ -10,6 +10,10 @@
 
 A smarter New Tab replacement for Google Chrome with easy access to most frequently visited bookmarks
 
+You can install it from the [Chrome Web Store](https://chrome.google.com/webstore/detail/chrome-live-bookmarks/fconcakelnfiacccnghcjhbmddloahfn).
+
+[![Screenshot](images/screenshot.png)](https://chrome.google.com/webstore/detail/chrome-live-bookmarks/fconcakelnfiacccnghcjhbmddloahfn)
+
 ## Features
 
 * Replaces the default 'New Tab' page with an opinionatedly better implementation that combines bookmarks with history
