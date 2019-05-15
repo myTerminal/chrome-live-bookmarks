@@ -167,10 +167,7 @@ html {
 
                 .bookmark-item,
                 .history-item {
-                    .box-sizing(border-box);
-                    margin-bottom: 5px;
-                    padding: 5px;
-                    .round-borders(2px);
+
                 }
             }
         }
@@ -316,6 +313,44 @@ html {
                     .bookmark-item,
                     .history-item {
 
+                    }
+                }
+            }
+        }
+
+        &.list {
+
+            #all-bookmarks {
+
+                .items {
+
+                    .bookmark-item,
+                    .history-item {
+                        .box-sizing(border-box);
+                        margin-bottom: 5px;
+                        padding: 5px;
+                        .round-borders(2px);
+                    }
+                }
+            }
+        }
+
+        &.pills {
+
+            #all-bookmarks {
+
+                .items {
+
+                    .bookmark-item,
+                    .history-item {
+                        display: inline-block;
+                        margin: 5px;
+                        padding: 5px;
+                        .round-borders(5px);
+
+                        .url {
+                            display: none;
+                        }
                     }
                 }
             }
