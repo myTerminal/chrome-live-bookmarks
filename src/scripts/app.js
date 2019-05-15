@@ -11,7 +11,10 @@ const start = () => {
     const titleDom = document.querySelector('#title #title-text'),
         bookmarksBarDom = document.querySelector('#bookmarks-bar .items'),
         bookmarksDom = document.querySelector('#all-bookmarks .items'),
-        colorThemeSwitcher = document.querySelector('#color-theme');
+        colorThemeSwitcher = document.querySelector('#color-theme'),
+        togglePreferencesButtonDom = document.querySelector('#toggle-preferences'),
+        preferencesDom = document.querySelector('#preferences'),
+        preferencesBackdrop = document.querySelector('#preferences .backdrop');
 
     // Create local variables
     let bookmarkNodes = [],
@@ -25,6 +28,14 @@ const start = () => {
 
     // Load color-theme
     get[StorageKeys.COLORTHEME](load[StorageKeys.COLORTHEME]);
+
+    // Attach event to toggle preferences
+    togglePreferencesButtonDom.onclick = () => {
+        preferencesDom.className += ' visible';
+    };
+    preferencesBackdrop.onclick = () => {
+        preferencesDom.className = preferencesDom.className.replace(' visible', '');
+    };
 
     // Set listener to color-theme changer
     colorThemeSwitcher.onclick = () => {
