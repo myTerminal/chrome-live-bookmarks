@@ -1,6 +1,6 @@
 /* global chrome document */
 
-import { ColorThemes, StorageKeys } from './constants';
+import { ColorThemes, ItemsLayouts, StorageKeys } from './constants';
 
 export const get = {
     [StorageKeys.COLORTHEME]: onDone => {
@@ -12,6 +12,16 @@ export const get = {
                 onDone(values[StorageKeys.COLORTHEME] || ColorThemes.LIGHT);
             }
         );
+    },
+    [StorageKeys.ITEMSLAYOUT]: onDone => {
+        chrome.storage.sync.get(
+            [
+                StorageKeys.ITEMSLAYOUT
+            ],
+            values => {
+                onDone(values[StorageKeys.ITEMSLAYOUT] || ItemsLayouts.LIST);
+            }
+        );
     }
 };
 
@@ -20,10 +30,19 @@ export const load = {
         const bodyDom = document.body;
 
         bodyDom.className = bodyDom.className
-            .replace(/(light|dark)/, '')
-            + value;
+            .replace(/ (light|dark)/, '')
+            + ` ${value}`;
 
         document.querySelector('#color-theme').innerText = value;
+    },
+    [StorageKeys.ITEMSLAYOUT]: value => {
+        const bodyDom = document.body;
+
+        bodyDom.className = bodyDom.className
+            .replace(/ (list|pills)/, '')
+            + ` ${value}`;
+
+        document.querySelector('#items-layout').innerText = value;
     }
 };
 
@@ -32,6 +51,14 @@ export const set = {
         chrome.storage.sync.set(
             {
                 [StorageKeys.COLORTHEME]: value
+            },
+            onDone
+        );
+    },
+    [StorageKeys.ITEMSLAYOUT]: (value, onDone) => {
+        chrome.storage.sync.set(
+            {
+                [StorageKeys.ITEMSLAYOUT]: value
             },
             onDone
         );

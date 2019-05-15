@@ -1,6 +1,11 @@
 /* global require process chrome window document */
 
-import { ItemTypes, ColorThemes, StorageKeys } from './constants';
+import {
+    ItemTypes,
+    ColorThemes,
+    ItemsLayouts,
+    StorageKeys
+} from './constants';
 import { get, load, set } from './preferences';
 import '../styles/styles.less';
 
@@ -12,6 +17,7 @@ const start = () => {
         bookmarksBarDom = document.querySelector('#bookmarks-bar .items'),
         bookmarksDom = document.querySelector('#all-bookmarks .items'),
         colorThemeSwitcher = document.querySelector('#color-theme'),
+        itemsLayoutSwitcher = document.querySelector('#items-layout'),
         togglePreferencesButtonDom = document.querySelector('#toggle-preferences'),
         preferencesDom = document.querySelector('#preferences'),
         preferencesBackdrop = document.querySelector('#preferences .backdrop');
@@ -26,8 +32,17 @@ const start = () => {
     // Set the title
     titleDom.innerText = `Chrome Live Bookmarks ${packageDetails.version}${process.env.NODE_ENV === 'development' ? ' [DEBUG]' : ''}`;
 
-    // Load color-theme
+    // Load preferences
     get[StorageKeys.COLORTHEME](load[StorageKeys.COLORTHEME]);
+    get[StorageKeys.ITEMSLAYOUT](load[StorageKeys.ITEMSLAYOUT]);
+
+    // Attach event to toggle preferences
+    togglePreferencesButtonDom.onclick = () => {
+        preferencesDom.className += ' visible';
+    };
+    preferencesBackdrop.onclick = () => {
+        preferencesDom.className = preferencesDom.className.replace(' visible', '');
+    };
 
     // Attach event to toggle preferences
     togglePreferencesButtonDom.onclick = () => {
@@ -46,6 +61,19 @@ const start = () => {
                     : ColorThemes.LIGHT;
 
                 set[StorageKeys.COLORTHEME](projectedColorTheme);
+            }
+        );
+    };
+
+    // Set listener to items-layout changer
+    itemsLayoutSwitcher.onclick = () => {
+        get[StorageKeys.ITEMSLAYOUT](
+            currentItemsLayout => {
+                const projectedItemsLayout = currentItemsLayout === ItemsLayouts.LIST
+                    ? ItemsLayouts.PILLS
+                    : ItemsLayouts.LIST;
+
+                set[StorageKeys.ITEMSLAYOUT](projectedItemsLayout);
             }
         );
     };

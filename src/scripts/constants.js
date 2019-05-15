@@ -8,6 +8,12 @@ export const ColorThemes = {
     DARK: 'dark'
 };
 
+export const ItemsLayouts = {
+    LIST: 'list',
+    PILLS: 'pills'
+};
+
 export const StorageKeys = {
-    COLORTHEME: 'color-theme'
+    COLORTHEME: 'color-theme',
+    ITEMSLAYOUT: 'items-layout'
 };
