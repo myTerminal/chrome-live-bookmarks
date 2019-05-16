@@ -1,4 +1,5 @@
 @import '../../node_modules/effortless-css/less/all.less';
+@import '../../node_modules/@fortawesome/fontawesome-free/css/all.min.css';
 
 @font-face {
     font-family: OpenSans;
@@ -28,10 +29,9 @@ html {
                 font-weight: bold;
             }
 
-            #toggle-preferences {
+            .title-icon {
                 position: absolute;
                 top: 0;
-                right: 0;
                 margin: 5px;
                 cursor: pointer;
                 .opacity(0.7);
@@ -39,6 +39,18 @@ html {
                 &:hover {
                     .opacity(1);
                 }
+            }
+
+            #source-link {
+                left: 0;
+
+                a {
+                    text-decoration: none;
+                }
+            }
+
+            #toggle-preferences {
+                right: 0;
             }
         }
 
@@ -180,6 +192,11 @@ html {
                 background-color: #eee;
                 color: #333;
                 border-bottom: 2px solid #999;
+
+                .title-icon,
+                .title-icon * {
+                    color: #333;
+                }
             }
 
             .section {
@@ -253,6 +270,11 @@ html {
                 background-color: #444;
                 color: #fff;
                 border-bottom: 2px solid #666;
+
+                .title-icon,
+                .title-icon * {
+                    color: #fff;
+                }
             }
 
             .section {

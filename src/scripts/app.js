@@ -30,7 +30,7 @@ const start = () => {
         recentlyHistoryItems = [];
 
     // Set the title
-    titleDom.innerText = `Chrome Live Bookmarks ${packageDetails.version}${process.env.NODE_ENV === 'development' ? ' [DEBUG]' : ''}`;
+    titleDom.innerText = `Chrome Live Bookmarks (${packageDetails.version})${process.env.NODE_ENV === 'development' ? ' [DEBUG]' : ''}`;
 
     // Load preferences
     get[StorageKeys.COLORTHEME](load[StorageKeys.COLORTHEME]);

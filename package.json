@@ -1,6 +1,6 @@
 {
   "name": "chrome-live-bookmarks",
-  "version": "0.9.1",
+  "version": "0.10.0",
   "description": "A smarter New Tab replacement for Google Chrome with easy access to most frequently visited bookmarks",
   "main": "build/index.html",
   "scripts": {
@@ -22,7 +22,9 @@
   ],
   "author": "Mohammed Ismail Ansari <team.terminal@gmail.com>",
   "license": "GPL-3.0",
-  "dependencies": {},
+  "dependencies": {
+    "@fortawesome/fontawesome-free": "5.8.2"
+  },
   "devDependencies": {
     "babel-core": "6.26.3",
     "babel-eslint": "10.0.1",
