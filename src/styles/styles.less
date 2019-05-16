@@ -16,14 +16,20 @@ html {
 
     body {
         margin: 0;
-        padding: 0;
+        padding: 35px 0 0 0;
         font-family: OpenSans;
         font-size: 14px;
 
         #title {
+            .box-sizing(border-box);
+            position: fixed;
+            top: 0;
             margin-bottom: 10px;
             padding: 5px;
+            width: 100%;
             text-align: center;
+            z-index: 10;
+            cursor: default;
 
             #title-text {
                 font-weight: bold;
@@ -102,6 +108,7 @@ html {
             top: 0;
             left: 0;
             overflow: hidden;
+            z-index: 20;
 
             .backdrop {
                 width: 100%;
