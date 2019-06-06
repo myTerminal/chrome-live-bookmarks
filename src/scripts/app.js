@@ -121,6 +121,9 @@ const start = () => {
 
                 // Apply visual scaling to bookmarks
                 applyScalingToBookmarks(bookmarksDom);
+
+                // Mark 'ready' state
+                document.body.className += ' ready';
             }
         );
     });

@@ -19,6 +19,13 @@ html {
         padding: 35px 0 0 0;
         font-family: OpenSans;
         font-size: 14px;
+        .transition(0.25s);
+
+        .opacity(0);
+
+        &.ready {
+            .opacity(1);
+        }
 
         #title {
             .box-sizing(border-box);
