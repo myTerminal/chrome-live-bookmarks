@@ -83,30 +83,12 @@ const start = () => {
         preferencesDom.className = preferencesDom.className.replace(' visible', '');
     };
 
-    // Set listener to color-theme changer
+    // Set listeners to toggle preference items
     colorThemeSwitcher.onclick = () => {
-        colorThemePreference.get(
-            currentColorTheme => {
-                const projectedColorTheme = currentColorTheme === ColorThemes[0]
-                    ? ColorThemes[1]
-                    : ColorThemes[0];
-
-                colorThemePreference.set(projectedColorTheme);
-            }
-        );
+        toggleProperty(colorThemePreference, ColorThemes);
     };
-
-    // Set listener to items-layout changer
     itemsLayoutSwitcher.onclick = () => {
-        itemsLayoutPreference.get(
-            currentItemsLayout => {
-                const projectedItemsLayout = currentItemsLayout === ItemsLayouts[0]
-                    ? ItemsLayouts[1]
-                    : ItemsLayouts[0];
-
-                itemsLayoutPreference.set(projectedItemsLayout);
-            }
-        );
+        toggleProperty(itemsLayoutPreference, ItemsLayouts);
     };
 
     // Read bookmarks
@@ -215,6 +197,19 @@ const applyScalingToBookmarks = parentDom => {
     items.forEach((t, i) => {
         t.style.fontSize = (scaleDelta * (items.length - i) + 1) + 'em';
     });
+};
+
+// Function to toggle a preference
+const toggleProperty = (property, values) => {
+    property.get(
+        currentValue => {
+            const projectedValue = currentValue === values[0]
+                ? values[1]
+                : values[0];
+
+            property.set(projectedValue);
+        }
+    );
 };
 
 // Start rendering the page
