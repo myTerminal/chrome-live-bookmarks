@@ -3,10 +3,12 @@
 import {
     ItemTypes,
     ColorThemes,
-    ItemsLayouts,
-    StorageKeys
+    ItemsLayouts
 } from './constants';
-import { get, load, set } from './preferences';
+import {
+    init as initializeStorage,
+    createProperty
+} from './storage';
 import '../styles/styles.less';
 
 const packageDetails = require('../../package.json');
@@ -22,6 +24,39 @@ const start = () => {
         preferencesDom = document.querySelector('#preferences'),
         preferencesBackdrop = document.querySelector('#preferences .backdrop');
 
+    // Initialize storage helper
+    initializeStorage();
+
+    // Create preference property for color-theme
+    const colorThemePreference = createProperty(
+        'color-theme',
+        ColorThemes,
+        value => {
+            const bodyDom = document.body;
+
+            bodyDom.className = bodyDom.className
+                .replace(/ (light|dark)/, '')
+                + ` ${value}`;
+
+            document.querySelector('#color-theme').innerText = value;
+        }
+    );
+
+    // Create preference property for items-layout
+    const itemsLayoutPreference = createProperty(
+        'items-layout',
+        ItemsLayouts,
+        value => {
+            const bodyDom = document.body;
+
+            bodyDom.className = bodyDom.className
+                .replace(/ (list|pills)/, '')
+                + ` ${value}`;
+
+            document.querySelector('#items-layout').innerText = value;
+        }
+    );
+
     // Create local variables
     let bookmarkNodes = [],
         urlBookmarks = [],
@@ -31,10 +66,6 @@ const start = () => {
 
     // Set the title
     titleDom.innerText = `Chrome Live Bookmarks (${packageDetails.version})${process.env.NODE_ENV === 'development' ? ' [DEBUG]' : ''}`;
-
-    // Load preferences
-    get[StorageKeys.COLORTHEME](load[StorageKeys.COLORTHEME]);
-    get[StorageKeys.ITEMSLAYOUT](load[StorageKeys.ITEMSLAYOUT]);
 
     // Attach event to toggle preferences
     togglePreferencesButtonDom.onclick = () => {
@@ -54,26 +85,26 @@ const start = () => {
 
     // Set listener to color-theme changer
     colorThemeSwitcher.onclick = () => {
-        get[StorageKeys.COLORTHEME](
+        colorThemePreference.get(
             currentColorTheme => {
-                const projectedColorTheme = currentColorTheme === ColorThemes.LIGHT
-                    ? ColorThemes.DARK
-                    : ColorThemes.LIGHT;
+                const projectedColorTheme = currentColorTheme === ColorThemes[0]
+                    ? ColorThemes[1]
+                    : ColorThemes[0];
 
-                set[StorageKeys.COLORTHEME](projectedColorTheme);
+                colorThemePreference.set(projectedColorTheme);
             }
         );
     };
 
     // Set listener to items-layout changer
     itemsLayoutSwitcher.onclick = () => {
-        get[StorageKeys.ITEMSLAYOUT](
+        itemsLayoutPreference.get(
             currentItemsLayout => {
-                const projectedItemsLayout = currentItemsLayout === ItemsLayouts.LIST
-                    ? ItemsLayouts.PILLS
-                    : ItemsLayouts.LIST;
+                const projectedItemsLayout = currentItemsLayout === ItemsLayouts[0]
+                    ? ItemsLayouts[1]
+                    : ItemsLayouts[0];
 
-                set[StorageKeys.ITEMSLAYOUT](projectedItemsLayout);
+                itemsLayoutPreference.set(projectedItemsLayout);
             }
         );
     };
@@ -185,20 +216,6 @@ const applyScalingToBookmarks = parentDom => {
         t.style.fontSize = (scaleDelta * (items.length - i) + 1) + 'em';
     });
 };
-
-// Listen to changes to preferences
-chrome.storage.sync.onChanged.addListener(
-    values => {
-        Object.keys(values)
-            .forEach(
-                k => {
-                    if (load[k]) {
-                        load[k](values[k].newValue);
-                    }
-                }
-            );
-    }
-);
 
 // Start rendering the page
 window.addEventListener('load', start);
