@@ -1,6 +1,6 @@
 export const ItemTypes = {
     BOOKMARK: 'bookmark',
-    history: 'history'
+    HISTORY: 'history'
 };
 
 export const ColorThemes = {
