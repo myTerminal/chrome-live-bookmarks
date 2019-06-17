@@ -5,6 +5,7 @@ import {
     ColorThemes,
     ItemsLayouts
 } from './constants';
+import { getSortedArrayByDescending } from './common';
 import {
     init as initializeStorage,
     createProperty
@@ -154,16 +155,7 @@ const renderUrlItems = (domElement, items, type, shouldAppend) => {
     }
 
     // Create DOM string representing items
-    const itemsDomString = items
-        .sort((a, b) => {
-            if (a.visitCount < b.visitCount) {
-                return 1;
-            } else if (a.visitCount > b.visitCount) {
-                return -1;
-            } else {
-                return 0;
-            }
-        })
+    const itemsDomString = getSortedArrayByDescending(items, 'visitCount')
         .filter(i => i.title && i.url)
         .map(
             b => `<div class="${type === ItemTypes.BOOKMARK ? 'bookmark-item' : 'history-item'}"><a href="${b.url}" title="${b.url}"><span class="title">${b.title}</span><span class="url">&nbsp;[${b.url}]</span></a></div>`
