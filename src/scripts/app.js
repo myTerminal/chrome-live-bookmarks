@@ -31,30 +31,20 @@ const start = () => {
     const colorThemePreference = createProperty(
         'color-theme',
         ColorThemes,
-        value => {
-            const bodyDom = document.body;
-
-            bodyDom.className = bodyDom.className
-                .replace(/ (light|dark)/, '')
-                + ` ${value}`;
-
-            document.querySelector('#color-theme').innerText = value;
-        }
+        createDomLoader(
+            / (light|dark)/,
+            document.querySelector('#color-theme')
+        )
     );
 
     // Create preference property for items-layout
     const itemsLayoutPreference = createProperty(
         'items-layout',
         ItemsLayouts,
-        value => {
-            const bodyDom = document.body;
-
-            bodyDom.className = bodyDom.className
-                .replace(/ (list|pills)/, '')
-                + ` ${value}`;
-
-            document.querySelector('#items-layout').innerText = value;
-        }
+        createDomLoader(
+            / (list|pills)/,
+            document.querySelector('#items-layout')
+        )
     );
 
     // Create local variables
@@ -211,6 +201,18 @@ const toggleProperty = (property, values) => {
         }
     );
 };
+
+// Function to load preference labels to DOM
+const createDomLoader = (search, domElement) =>
+    value => {
+        const bodyDom = document.body;
+
+        bodyDom.className = bodyDom.className
+            .replace(search, '')
+            + ` ${value}`;
+
+        domElement.innerText = value;
+    };
 
 // Start rendering the page
 window.addEventListener('load', start);
