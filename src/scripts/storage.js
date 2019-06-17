@@ -41,24 +41,8 @@ export const createProperty = (
     const property = {
         name: propertyName,
         values: propertyValues,
-        set: (value, onDone) => {
-            chrome.storage.sync.set(
-                {
-                    [propertyName]: value
-                },
-                onDone
-            );
-        },
-        get: onDone => {
-            chrome.storage.sync.get(
-                [
-                    propertyName
-                ],
-                values => {
-                    onDone(values[propertyName] || propertyValues[0]);
-                }
-            );
-        },
+        set: createSetter(chrome.storage.sync, propertyName),
+        get: createGetter(chrome.storage.sync, propertyName, propertyValues),
         load: loader
     };
 
@@ -71,3 +55,27 @@ export const createProperty = (
     // Return the newly created property
     return property;
 };
+
+// Function to create setter
+const createSetter = (store, name) =>
+    (value, onDone) => {
+        store.set(
+            {
+                [name]: value
+            },
+            onDone
+        );
+    };
+
+// Function to create getter
+const createGetter = (store, name, possibleValues) =>
+    onDone => {
+        store.get(
+            [
+                name
+            ],
+            values => {
+                onDone(values[name] || possibleValues[0]);
+            }
+        );
+    };
