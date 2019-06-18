@@ -7,8 +7,8 @@ import {
 } from './constants';
 import { getSortedArrayByDescending } from './common';
 import {
-    init as initializeStorage,
-    createProperty
+    initializeStorage,
+    createSyncedProperty
 } from './storage';
 import '../styles/styles.less';
 
@@ -29,7 +29,7 @@ const start = () => {
     initializeStorage();
 
     // Create preference property for color-theme
-    const colorThemePreference = createProperty(
+    const colorThemePreference = createSyncedProperty(
         'color-theme',
         ColorThemes,
         createDomLoader(
@@ -39,7 +39,7 @@ const start = () => {
     );
 
     // Create preference property for items-layout
-    const itemsLayoutPreference = createProperty(
+    const itemsLayoutPreference = createSyncedProperty(
         'items-layout',
         ItemsLayouts,
         createDomLoader(
