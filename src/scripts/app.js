@@ -1,15 +1,17 @@
 /* global require process chrome window document */
 
 import {
+    initializeStorage,
+    createSyncedProperty
+} from 'chrome-extension-helper';
+
+import {
     ItemTypes,
     ColorThemes,
     ItemsLayouts
 } from './constants';
 import { getSortedArrayByDescending } from './common';
-import {
-    initializeStorage,
-    createSyncedProperty
-} from './storage';
+
 import '../styles/styles.less';
 
 const packageDetails = require('../../package.json');
