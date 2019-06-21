@@ -1,9 +1,6 @@
 /* global require process chrome window document */
 
-import {
-    initializeStorage,
-    createSyncedProperty
-} from 'chrome-extension-helper';
+import { storage } from 'chrome-extension-helper';
 
 import {
     ItemTypes,
@@ -28,10 +25,10 @@ const start = () => {
         preferencesBackdrop = document.querySelector('#preferences .backdrop');
 
     // Initialize storage helper
-    initializeStorage();
+    storage.initializeStorage();
 
     // Create preference property for color-theme
-    const colorThemePreference = createSyncedProperty(
+    const colorThemePreference = storage.createSyncedProperty(
         'color-theme',
         ColorThemes,
         createDomLoader(
@@ -41,7 +38,7 @@ const start = () => {
     );
 
     // Create preference property for items-layout
-    const itemsLayoutPreference = createSyncedProperty(
+    const itemsLayoutPreference = storage.createSyncedProperty(
         'items-layout',
         ItemsLayouts,
         createDomLoader(
