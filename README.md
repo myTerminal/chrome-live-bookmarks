@@ -2,6 +2,7 @@
 
 [![Build Status](https://travis-ci.org/myTerminal/chrome-live-bookmarks.svg?branch=master)](https://travis-ci.org/myTerminal/chrome-live-bookmarks)
 [![Code Climate](https://codeclimate.com/github/myTerminal/chrome-live-bookmarks.png)](https://codeclimate.com/github/myTerminal/chrome-live-bookmarks)
+[![js-myterminal-style](https://img.shields.io/badge/code%20style-myterminal-blue.svg)](https://www.npmjs.com/package/eslint-config/myterminal)
 [![Coverage Status](https://img.shields.io/coveralls/myTerminal/chrome-live-bookmarks.svg)](https://coveralls.io/r/myTerminal/chrome-live-bookmarks?branch=master)  
 [![Dependency Status](https://david-dm.org/myTerminal/chrome-live-bookmarks.svg)](https://david-dm.org/myTerminal/chrome-live-bookmarks)
 [![devDependency Status](https://david-dm.org/myTerminal/chrome-live-bookmarks/dev-status.svg)](https://david-dm.org/myTerminal/chrome-live-bookmarks#info=devDependencies)
