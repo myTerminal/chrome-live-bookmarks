@@ -65,14 +65,6 @@ const start = () => {
         preferencesDom.className = preferencesDom.className.replace(' visible', '');
     };
 
-    // Attach event to toggle preferences
-    togglePreferencesButtonDom.onclick = () => {
-        preferencesDom.className += ' visible';
-    };
-    preferencesBackdrop.onclick = () => {
-        preferencesDom.className = preferencesDom.className.replace(' visible', '');
-    };
-
     // Set listeners to toggle preference items
     colorThemeSwitcher.onclick = () => {
         toggleProperty(colorThemePreference, ColorThemes);
