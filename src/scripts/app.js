@@ -17,6 +17,9 @@ const start = () => {
     // Get reference to DOM elements
     const titleDom = document.querySelector('#title #title-text'),
         bookmarksBarDom = document.querySelector('#bookmarks-bar .items'),
+        sessionsDom = document.querySelector('#browser-sessions .items'),
+        saveCurrentSessionDom = document.querySelector('#save-session'),
+        clearSavedSessionsDom = document.querySelector('#clear-sessions'),
         bookmarksDom = document.querySelector('#all-bookmarks .items'),
         colorThemeSwitcher = document.querySelector('#color-theme'),
         itemsLayoutSwitcher = document.querySelector('#items-layout'),
@@ -47,6 +50,15 @@ const start = () => {
         )
     );
 
+    // Create preference property for browser-sessions
+    const storedBrowserSessions = storage.createSyncedProperty(
+        'browser-sessions',
+        ['[]'],
+        value => {
+            renderSessionItems(sessionsDom, value, storedBrowserSessions);
+        }
+    );
+
     // Create local variables
     let bookmarkNodes = [],
         urlBookmarks = [],
@@ -71,6 +83,46 @@ const start = () => {
     };
     itemsLayoutSwitcher.onclick = () => {
         toggleProperty(itemsLayoutPreference, ItemsLayouts);
+    };
+
+    // Attach event to save current session
+    saveCurrentSessionDom.onclick = () => {
+        // Read stored sessions
+        chrome.tabs.query(
+            {
+                currentWindow: true
+            },
+            tabs => {
+                // Create an array of tab URLs
+                const sessionInfo = tabs.map(t => t.url);
+
+                // Get current value
+                storedBrowserSessions.get(
+                    value => {
+                        // Convert retrieved value to array
+                        const currentListOfSessions = JSON.parse(value);
+
+                        // Ignore chrome://newtab
+                        const tabUrls = sessionInfo.filter(s => s !== 'chrome://newtab/');
+
+                        // Skip if there's no tab to be saved
+                        if (!tabUrls.length) {
+                            return;
+                        }
+
+                        // Store current session along with previously stored sessions
+                        storedBrowserSessions.set(
+                            JSON.stringify([tabUrls].concat(currentListOfSessions))
+                        );
+                    }
+                );
+            }
+        );
+    };
+
+    // Attach event to clear saved sessions
+    clearSavedSessionsDom.onclick = () => {
+        storedBrowserSessions.set('[]');
     };
 
     // Read bookmarks
@@ -138,6 +190,81 @@ const flattenTree = node =>
                 : []
         );
 
+// Function to render session items to the supplied Dom element
+const renderSessionItems = (domElement, items, storedBrowserSessions) => {
+    // Parse JSON string
+    const parsedItems = JSON.parse(items);
+
+    // Quit when the supplied collection is empty
+    if (!parsedItems.length) {
+        domElement.innerHTML = 'Your previously saved browser sessions appear here. You did not save any yet.';
+        return;
+    }
+
+    // Create DOM string representing items
+    const itemsDomString = parsedItems
+        .map(
+            (s, i) => {
+                const label = s.length === 1 ? `${s.length} tab` : `${s.length} tabs`;
+
+                return `<div class="${ItemTypes.SESSION}" data-index="${i}" title="Restore ${label}">${label}</div>`;
+            }
+        )
+        .join('');
+
+    // Assign DOM string to container
+    domElement.innerHTML = itemsDomString;
+
+    // Attach event handlers to restore saved sessions
+    domElement.querySelectorAll(`.${ItemTypes.SESSION}`)
+        .forEach(
+            item => {
+                item.onclick = e => {
+                    const itemIndex = +e.target.getAttribute('data-index');
+
+                    storedBrowserSessions.get(
+                        value => {
+                            // Determine the selected session
+                            const sessions = JSON.parse(value);
+                            const selectedSession = sessions[itemIndex];
+
+                            restoreSession(selectedSession);
+                        }
+                    );
+                };
+            }
+        );
+};
+
+const restoreSession = tabUrls => {
+    chrome.windows.create(
+        window => {
+            // Extract the window id
+            const windowId = window.id;
+
+            // Navigate to the first URL in the current tab
+            chrome.tabs.update(
+                window.tabs[0].id,
+                {
+                    url: tabUrls[0]
+                }
+            );
+
+            // Open the rest of the URLs in new tabs
+            tabUrls.slice(1).forEach(
+                url => {
+                    chrome.tabs.create(
+                        {
+                            windowId,
+                            url
+                        }
+                    );
+                }
+            );
+        }
+    );
+};
+
 // Function to render items of a particular type to a supplied Dom element
 const renderUrlItems = (domElement, items, type, shouldAppend) => {
     // Quit when the supplied collection is empty
@@ -149,7 +276,7 @@ const renderUrlItems = (domElement, items, type, shouldAppend) => {
     const itemsDomString = getSortedArrayByDescending(items, 'visitCount')
         .filter(i => i.title && i.url)
         .map(
-            b => `<div class="${type === ItemTypes.BOOKMARK ? 'bookmark-item' : 'history-item'}"><a href="${b.url}" title="${b.url}"><span class="title">${b.title}</span><span class="url">&nbsp;[${b.url}]</span></a></div>`
+            b => `<div class="${type}"><a href="${b.url}" title="${b.url}"><span class="title">${b.title}</span><span class="url">&nbsp;[${b.url}]</span></a></div>`
         )
         .join('');
 

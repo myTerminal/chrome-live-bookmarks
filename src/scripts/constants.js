@@ -1,6 +1,7 @@
 export const ItemTypes = {
-    BOOKMARK: 'bookmark',
-    HISTORY: 'history'
+    BOOKMARK: 'bookmark-item',
+    SESSION: 'session-item',
+    HISTORY: 'history-item'
 };
 
 export const ColorThemes = [

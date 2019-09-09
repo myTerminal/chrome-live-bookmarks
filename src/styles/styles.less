@@ -187,6 +187,28 @@ html {
             }
         }
 
+        #browser-sessions {
+
+            .header {
+
+                #save-session,
+                #clear-sessions {
+                    cursor: pointer;
+                }
+            }
+
+            .items {
+
+                .session-item {
+                    cursor: pointer;
+                    display: inline-block;
+                    margin: 5px;
+                    padding: 5px;
+                    .round-borders(5px);
+                }
+            }
+        }
+
         #all-bookmarks {
 
             .items {
@@ -222,6 +244,7 @@ html {
                 .items {
 
                     .bookmark-item,
+                    .session-item,
                     .history-item {
                         background-color: #ddd;
                         border: 1px solid #bbb;
@@ -300,6 +323,7 @@ html {
                 .items {
 
                     .bookmark-item,
+                    .session-item,
                     .history-item {
                         background-color: #333;
                         border: 1px solid #666;

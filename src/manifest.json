@@ -13,7 +13,8 @@
   "permissions": [
     "bookmarks",
     "history",
-    "storage"
+    "storage",
+    "tabs"
   ],
   "chrome_url_overrides": {
     "newtab": "index.html"
