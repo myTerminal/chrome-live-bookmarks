@@ -27,6 +27,13 @@ const start = () => {
         preferencesDom = document.querySelector('#preferences'),
         preferencesBackdrop = document.querySelector('#preferences .backdrop');
 
+    // Create local variables
+    let bookmarkNodes = [],
+        urlBookmarks = [],
+        bookmarksBarBookmarks = [],
+        recentVisitedBookmarks = [],
+        recentlyHistoryItems = [];
+
     // Initialize storage helper
     storage.initializeStorage();
 
@@ -59,13 +66,6 @@ const start = () => {
         }
     );
 
-    // Create local variables
-    let bookmarkNodes = [],
-        urlBookmarks = [],
-        bookmarksBarBookmarks = [],
-        recentVisitedBookmarks = [],
-        recentlyHistoryItems = [];
-
     // Set the title
     titleDom.innerText = `Chrome Live Bookmarks (${packageDetails.version})${process.env.NODE_ENV === 'development' ? ' [DEBUG]' : ''}`;
 
@@ -88,9 +88,7 @@ const start = () => {
     // Attach event to save current session
     saveCurrentSessionDom.onclick = () => {
         // Prompt for a name for the session
-        const sessionName = window.prompt(
-            'What would you like to name the session?'
-        );
+        const sessionName = window.prompt('What would you like to name the session?');
 
         // If no name is received, abort saving the session
         if (!sessionName) {
@@ -99,9 +97,7 @@ const start = () => {
 
         // Read stored sessions
         chrome.tabs.query(
-            {
-                currentWindow: true
-            },
+            { currentWindow: true },
             tabs => {
                 // Create an array of tab URLs
                 const tabUrlsToSave = tabs.map(t => t.url)
@@ -115,16 +111,11 @@ const start = () => {
                 // Get current value
                 storedBrowserSessions.get(
                     value => {
-                        // Convert retrieved value to array
-                        const currentListOfSessions = JSON.parse(value);
-
                         // Store current session along with previously stored sessions
                         storedBrowserSessions.set(
                             JSON.stringify(
-                                [
-                                    { name: sessionName, urls: tabUrlsToSave }
-                                ]
-                                    .concat(currentListOfSessions)
+                                [{ name: sessionName, urls: tabUrlsToSave }]
+                                    .concat(JSON.parse(value))
                             )
                         );
                     }
@@ -154,10 +145,7 @@ const start = () => {
 
         // Retrieve recent visits from history
         chrome.history.search(
-            {
-                text: '',
-                maxResults: 100
-            },
+            { text: '', maxResults: 100 },
             items => {
                 // Determine recently visited bookmarks
                 recentVisitedBookmarks = items
@@ -194,12 +182,9 @@ const flattenTree = node =>
     [node]
         .concat(
             node.children
-                ? node.children.map(
-                    n => flattenTree(n)
-                ).reduce(
-                    (a, c) => a.concat(c),
-                    []
-                )
+                ? node.children
+                    .map(n => flattenTree(n))
+                    .reduce((a, c) => a.concat(c), [])
                 : []
         );
 
@@ -238,8 +223,7 @@ const renderSessionItems = (domElement, items, storedBrowserSessions) => {
                     storedBrowserSessions.get(
                         value => {
                             // Determine the selected session
-                            const sessions = JSON.parse(value);
-                            const selectedSession = sessions[itemIndex];
+                            const selectedSession = JSON.parse(value)[itemIndex];
 
                             restoreSession(selectedSession.urls);
                         }
@@ -308,7 +292,7 @@ const applyScalingToBookmarks = parentDom => {
         scaleDelta = (maxScale - 1) / items.length;
 
     items.forEach((t, i) => {
-        t.style.fontSize = (scaleDelta * (items.length - i) + 1) + 'em';
+        t.style.fontSize = `${(scaleDelta * (items.length - i) + 1)}em`;
     });
 };
 
@@ -330,10 +314,7 @@ const createDomLoader = (search, domElement) =>
     value => {
         const bodyDom = document.body;
 
-        bodyDom.className = bodyDom.className
-            .replace(search, '')
-            + ` ${value}`;
-
+        bodyDom.className = `${bodyDom.className.replace(search, '')} ${value}`;
         domElement.innerText = value;
     };
 
