@@ -87,6 +87,16 @@ const start = () => {
 
     // Attach event to save current session
     saveCurrentSessionDom.onclick = () => {
+        // Prompt for a name for the session
+        const sessionName = window.prompt(
+            'What would you like to name the session?'
+        );
+
+        // If no name is received, abort saving the session
+        if (!sessionName) {
+            return;
+        }
+
         // Read stored sessions
         chrome.tabs.query(
             {
@@ -94,7 +104,13 @@ const start = () => {
             },
             tabs => {
                 // Create an array of tab URLs
-                const sessionInfo = tabs.map(t => t.url);
+                const tabUrlsToSave = tabs.map(t => t.url)
+                    .filter(s => s !== 'chrome://newtab/'); // Ignore chrome://newtab
+
+                // Skip if there's no tab to be saved
+                if (!tabUrlsToSave.length) {
+                    return;
+                }
 
                 // Get current value
                 storedBrowserSessions.get(
@@ -102,17 +118,14 @@ const start = () => {
                         // Convert retrieved value to array
                         const currentListOfSessions = JSON.parse(value);
 
-                        // Ignore chrome://newtab
-                        const tabUrls = sessionInfo.filter(s => s !== 'chrome://newtab/');
-
-                        // Skip if there's no tab to be saved
-                        if (!tabUrls.length) {
-                            return;
-                        }
-
                         // Store current session along with previously stored sessions
                         storedBrowserSessions.set(
-                            JSON.stringify([tabUrls].concat(currentListOfSessions))
+                            JSON.stringify(
+                                [
+                                    { name: sessionName, urls: tabUrlsToSave }
+                                ]
+                                    .concat(currentListOfSessions)
+                            )
                         );
                     }
                 );
@@ -204,10 +217,10 @@ const renderSessionItems = (domElement, items, storedBrowserSessions) => {
     // Create DOM string representing items
     const itemsDomString = parsedItems
         .map(
-            (s, i) => {
-                const label = s.length === 1 ? `${s.length} tab` : `${s.length} tabs`;
+            ({ name, urls }, i) => {
+                const lengthLabel = urls.length === 1 ? `${urls.length} tab` : `${urls.length} tabs`;
 
-                return `<div class="${ItemTypes.SESSION}" data-index="${i}" title="Restore ${label}">${label}</div>`;
+                return `<div class="${ItemTypes.SESSION}" data-index="${i}" title="Restore ${lengthLabel}">${name} - ${lengthLabel}</div>`;
             }
         )
         .join('');
@@ -228,7 +241,7 @@ const renderSessionItems = (domElement, items, storedBrowserSessions) => {
                             const sessions = JSON.parse(value);
                             const selectedSession = sessions[itemIndex];
 
-                            restoreSession(selectedSession);
+                            restoreSession(selectedSession.urls);
                         }
                     );
                 };
@@ -236,7 +249,7 @@ const renderSessionItems = (domElement, items, storedBrowserSessions) => {
         );
 };
 
-const restoreSession = tabUrls => {
+const restoreSession = urlsToRestore => {
     chrome.windows.create(
         window => {
             // Extract the window id
@@ -246,12 +259,12 @@ const restoreSession = tabUrls => {
             chrome.tabs.update(
                 window.tabs[0].id,
                 {
-                    url: tabUrls[0]
+                    url: urlsToRestore[0]
                 }
             );
 
             // Open the rest of the URLs in new tabs
-            tabUrls.slice(1).forEach(
+            urlsToRestore.slice(1).forEach(
                 url => {
                     chrome.tabs.create(
                         {
