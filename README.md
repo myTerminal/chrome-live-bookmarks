@@ -18,11 +18,13 @@ You can install it from the [Chrome Web Store](https://chrome.google.com/webstor
 ## Features
 
 * Replaces the default 'New Tab' page with an opinionatedly better implementation that combines bookmarks with history
+* Allows user to save and restore browser sessions (across computers)
 * Supports light and dark color-themes
 * More to come...
 
 ## To-do
 
+* Detect auto-update and inform user about the change
 * Also show bookmarks that are not on the bookmarks bar
-* Add option to modify the list
+* Add option to modify the list items
 * Improve visuals
