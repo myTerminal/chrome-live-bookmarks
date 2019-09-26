@@ -87,6 +87,10 @@ html {
                     a:active {
                         text-decoration: none;
                         word-break: break-word;
+
+                        &:not(:first-child) {
+                            .opacity(0.5);
+                        }
                     }
 
                     .title {

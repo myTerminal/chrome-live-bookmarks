@@ -273,7 +273,14 @@ const renderUrlItems = (domElement, items, type, shouldAppend) => {
     const itemsDomString = getSortedArrayByDescending(items, 'visitCount')
         .filter(i => i.title && i.url)
         .map(
-            b => `<div class="${type}"><a href="${b.url}" title="${b.url}"><span class="title">${b.title}</span><span class="url">&nbsp;[${b.url}]</span></a></div>`
+            b => `
+<div class="${type}">
+  <a href="${b.url}" title="${b.url}">
+    <span class="title">${b.title}</span>
+    <span class="url">&nbsp;[${b.url}]</span>
+  </a>
+  <a class="fas fa-external-link-alt" href="${b.url}" target="_blank" title="Open in a new tab"></a>
+</div>`
         )
         .join('');
 
