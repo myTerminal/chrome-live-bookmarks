@@ -14,5 +14,26 @@ export const getSortedArrayByDescending = (array, property) =>
             }
         );
 
-// Only to suppress ESlint error
-export const dummy = null;
+// Function to flatten bookmark under a node into a collection
+export const flattenTree = node =>
+    [node]
+        .concat(
+            node.children
+                ? node.children
+                    .map(n => flattenTree(n))
+                    .reduce((a, c) => a.concat(c), [])
+                : []
+        );
+
+// Function to toggle a preference
+export const toggleProperty = (property, values) => {
+    property.get(
+        currentValue => {
+            const projectedValue = currentValue === values[0]
+                ? values[1]
+                : values[0];
+
+            property.set(projectedValue);
+        }
+    );
+};

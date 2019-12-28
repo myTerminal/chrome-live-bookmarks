@@ -2,9 +2,6 @@
 
 import { storage } from 'chrome-extension-helper';
 import {
-    alert,
-    confirm,
-    prompt,
     switchToDarkTheme,
     switchToLightTheme
 } from 'ample-alerts/build/scripts/ample-alerts.promises';
@@ -14,11 +11,100 @@ import {
     ColorThemes,
     ItemsLayouts
 } from './constants';
-import { getSortedArrayByDescending } from './common';
+import {
+    getSortedArrayByDescending,
+    flattenTree,
+    toggleProperty
+} from './common';
+import {
+    createDomLoader,
+    applyScalingToBookmarks
+} from './dom';
+import {
+    createSaveSessionHandler,
+    createClearAllSessionsHandler,
+    onSessionItemClick,
+    onSessionItemRenameAction,
+    onSessionItemDeleteAction
+} from './events';
 
 import '../styles/styles.less';
 
 const packageDetails = require('../../package.json');
+
+// Function to render session items to the supplied Dom element
+const renderSessionItems = (domElement, items, storedSessionsProperty) => {
+    // Quit when the supplied collection is empty
+    if (!items.length) {
+        domElement.innerHTML = 'Your previously saved browser sessions appear here. You did not save any yet.';
+        return;
+    }
+
+    // Create DOM string representing items
+    const itemsDomStrings = items
+        .map(
+            ({ sessionName, urls }, i) => {
+                const lengthLabel = urls.length === 1 ? `${urls.length} tab` : `${urls.length} tabs`;
+
+                return `<div class="${ItemTypes.SESSION}" data-index="${i}" title="Restore ${lengthLabel}">
+    <span class="session-item-label">${sessionName} - ${lengthLabel}</span>
+    <span class="session-item-rename fas fa-pencil-alt" title="Rename"></span>
+    <span class="session-item-delete fas fa-trash-alt" title="Delete"></span>
+</div>`;
+            }
+        );
+
+    // Assign DOM string to container
+    domElement.innerHTML = itemsDomStrings.join('');
+
+    // Attach event handlers to restore saved sessions
+    domElement.querySelectorAll(`.${ItemTypes.SESSION}`)
+        .forEach(
+            (item, index) => {
+                item.onclick = () => { onSessionItemClick(index, storedSessionsProperty); };
+
+                item.querySelector('.session-item-rename')
+                    .onclick = e => {
+                        e.stopPropagation();
+                        onSessionItemRenameAction(index, storedSessionsProperty);
+                    };
+
+                item.querySelector('.session-item-delete')
+                    .onclick = e => {
+                        e.stopPropagation();
+                        onSessionItemDeleteAction(index, storedSessionsProperty);
+                    };
+            }
+        );
+};
+
+// Function to render items of a particular type to a supplied Dom element
+const renderUrlItems = (domElement, items, type, shouldAppend) => {
+    // Quit when the supplied collection is empty
+    if (!items.length) { return; }
+
+    // Create DOM string representing items
+    const itemsDomString = getSortedArrayByDescending(items, 'visitCount')
+        .filter(i => i.title && i.url)
+        .map(
+            b => `
+<div class="${type}">
+  <a href="${b.url}" title="${b.url}">
+    <span class="title">${b.title}</span>
+    <span class="url">&nbsp;[${b.url}]</span>
+  </a>
+  <a class="fas fa-external-link-alt" href="${b.url}" target="_blank" title="Open in a new tab"></a>
+</div>`
+        )
+        .join('');
+
+    // Append or assign DOM string to container
+    if (shouldAppend) {
+        domElement.innerHTML += itemsDomString;
+    } else {
+        domElement.innerHTML = itemsDomString;
+    }
+};
 
 const start = () => {
     // Get reference to DOM elements
@@ -51,9 +137,7 @@ const start = () => {
         createDomLoader(
             / (light|dark)/,
             document.querySelector('#color-theme'),
-            v => {
-                (v === 'dark' ? switchToDarkTheme : switchToLightTheme)();
-            }
+            v => { (v === 'dark' ? switchToDarkTheme : switchToLightTheme)(); }
         )
     );
 
@@ -71,9 +155,7 @@ const start = () => {
     const storedSessionsProperty = storage.createSyncedProperty(
         'browser-sessions',
         [[]],
-        value => {
-            renderSessionItems(sessionsDom, value, storedSessionsProperty);
-        }
+        value => { renderSessionItems(sessionsDom, value, storedSessionsProperty); }
     );
 
     // Set the title
@@ -96,49 +178,10 @@ const start = () => {
     };
 
     // Attach event to save current session
-    saveCurrentSessionDom.onclick = () => {
-        prompt(
-            'What would you like to name the session?',
-            { isModal: true, defaultResponse: `Session ${(new Date()).getTime()}` }
-        ).then(
-            sessionName => {
-                chrome.tabs.query(
-                    { currentWindow: true },
-                    tabs => {
-                        // Create an array of tab URLs
-                        const tabUrlsToSave = tabs.map(t => t.url)
-                            .filter(s => s !== 'chrome://newtab/'); // Ignore chrome://newtab
-
-                        // Skip if there's no tab to be saved
-                        if (!tabUrlsToSave.length) { return; }
-
-                        // Get current value
-                        storedSessionsProperty.get(
-                            value => {
-                                // Store current session along with previously stored sessions
-                                storedSessionsProperty.set(
-                                    [{ sessionName, urls: tabUrlsToSave }]
-                                        .concat(value)
-                                );
-                            }
-                        );
-                    }
-                );
-            }
-        );
-    };
+    saveCurrentSessionDom.onclick = createSaveSessionHandler(storedSessionsProperty);
 
     // Attach event to clear saved sessions
-    clearSavedSessionsDom.onclick = () => {
-        confirm(
-            'Delete all saved sessions?',
-            { isModal: true }
-        ).then(
-            () => {
-                storedSessionsProperty.set([]);
-            }
-        );
-    };
+    clearSavedSessionsDom.onclick = createClearAllSessionsHandler(storedSessionsProperty);
 
     // Read bookmarks
     chrome.bookmarks.getTree(tree => {
@@ -187,217 +230,6 @@ const start = () => {
         );
     });
 };
-
-// Function to flatten bookmark under a node into a collection
-const flattenTree = node =>
-    [node]
-        .concat(
-            node.children
-                ? node.children
-                    .map(n => flattenTree(n))
-                    .reduce((a, c) => a.concat(c), [])
-                : []
-        );
-
-// Function to render session items to the supplied Dom element
-const renderSessionItems = (domElement, items, storedSessionsProperty) => {
-    // Parse JSON string
-    const parsedItems = items;
-
-    // Quit when the supplied collection is empty
-    if (!parsedItems.length) {
-        domElement.innerHTML = 'Your previously saved browser sessions appear here. You did not save any yet.';
-        return;
-    }
-
-    // Create DOM string representing items
-    const itemsDomStrings = parsedItems
-        .map(
-            ({ sessionName, urls }, i) => {
-                const lengthLabel = urls.length === 1 ? `${urls.length} tab` : `${urls.length} tabs`;
-
-                return `<div class="${ItemTypes.SESSION}" data-index="${i}" title="Restore ${lengthLabel}">
-    <span class="session-item-label">${sessionName} - ${lengthLabel}</span>
-    <span class="session-item-rename fas fa-pencil-alt" title="Rename"></span>
-    <span class="session-item-delete fas fa-trash-alt" title="Delete"></span>
-</div>`;
-            }
-        );
-
-    // Assign DOM string to container
-    domElement.innerHTML = itemsDomStrings.join('');
-
-    // Attach event handlers to restore saved sessions
-    domElement.querySelectorAll(`.${ItemTypes.SESSION}`)
-        .forEach(
-            (item, index) => {
-                item.onclick = () => { onSessionItemClick(index, storedSessionsProperty); };
-
-                item.querySelector('.session-item-rename')
-                    .onclick = e => {
-                        e.stopPropagation();
-                        onSessionItemRenameAction(index, storedSessionsProperty);
-                    };
-
-                item.querySelector('.session-item-delete')
-                    .onclick = e => {
-                        e.stopPropagation();
-                        onSessionItemDeleteAction(index, storedSessionsProperty);
-                    };
-            }
-        );
-};
-
-const onSessionItemClick = (itemIndex, storedSessionsProperty) => {
-    storedSessionsProperty.get(
-        values => { restoreSession(values[itemIndex].urls); }
-    );
-};
-
-const onSessionItemRenameAction = (itemIndex, storedSessionsProperty) => {
-    prompt(
-        'Enter a new name for the session',
-        { isModal: true }
-    ).then(
-        newName => {
-            // Abort rename if no name is provided
-            if (!newName) {
-                alert(
-                    'Session not renamed',
-                    { autoClose: 2000 }
-                );
-
-                return;
-            }
-
-            storedSessionsProperty.get(
-                values => {
-                    storedSessionsProperty.set(
-                        values.map(
-                            (session, i) =>
-                                (i === itemIndex ? { ...session, sessionName: newName } : session)
-                        )
-                    );
-                }
-            );
-        }
-    );
-};
-
-const onSessionItemDeleteAction = (itemIndex, storedSessionsProperty) => {
-    confirm(
-        'Delete the saved session?',
-        { isModal: true }
-    ).then(
-        () => {
-            storedSessionsProperty.get(
-                values => {
-                    storedSessionsProperty.set(
-                        values.filter(
-                            (v, i) => i !== itemIndex
-                        )
-                    );
-                }
-            );
-        }
-    );
-};
-
-const restoreSession = urlsToRestore => {
-    chrome.windows.create(
-        window => {
-            // Extract the window id
-            const windowId = window.id;
-
-            // Navigate to the first URL in the current tab
-            chrome.tabs.update(
-                window.tabs[0].id,
-                {
-                    url: urlsToRestore[0]
-                }
-            );
-
-            // Open the rest of the URLs in new tabs
-            urlsToRestore.slice(1).forEach(
-                url => {
-                    chrome.tabs.create(
-                        {
-                            windowId,
-                            url
-                        }
-                    );
-                }
-            );
-        }
-    );
-};
-
-// Function to render items of a particular type to a supplied Dom element
-const renderUrlItems = (domElement, items, type, shouldAppend) => {
-    // Quit when the supplied collection is empty
-    if (!items.length) {
-        return;
-    }
-
-    // Create DOM string representing items
-    const itemsDomString = getSortedArrayByDescending(items, 'visitCount')
-        .filter(i => i.title && i.url)
-        .map(
-            b => `
-<div class="${type}">
-  <a href="${b.url}" title="${b.url}">
-    <span class="title">${b.title}</span>
-    <span class="url">&nbsp;[${b.url}]</span>
-  </a>
-  <a class="fas fa-external-link-alt" href="${b.url}" target="_blank" title="Open in a new tab"></a>
-</div>`
-        )
-        .join('');
-
-    // Append or assign DOM string to container
-    if (shouldAppend) {
-        domElement.innerHTML += itemsDomString;
-    } else {
-        domElement.innerHTML = itemsDomString;
-    }
-};
-
-// Function to apply scaling to bookmarks
-const applyScalingToBookmarks = parentDom => {
-    const items = parentDom.querySelectorAll('.bookmark-item'),
-        maxScale = 2,
-        scaleDelta = (maxScale - 1) / items.length;
-
-    items.forEach((t, i) => {
-        t.style.fontSize = `${(scaleDelta * (items.length - i) + 1)}em`;
-    });
-};
-
-// Function to toggle a preference
-const toggleProperty = (property, values) => {
-    property.get(
-        currentValue => {
-            const projectedValue = currentValue === values[0]
-                ? values[1]
-                : values[0];
-
-            property.set(projectedValue);
-        }
-    );
-};
-
-// Function to load preference labels to DOM
-const createDomLoader = (search, domElement, onDone) =>
-    value => {
-        const bodyDom = document.body;
-
-        bodyDom.className = `${bodyDom.className.replace(search, '')} ${value}`;
-        domElement.innerText = value;
-
-        if (onDone) {
-            onDone(value);
-        }
-    };
 
 // Start rendering the page
 window.addEventListener('load', start);
