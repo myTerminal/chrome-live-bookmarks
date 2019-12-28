@@ -50,11 +50,7 @@ const start = () => {
             / (light|dark)/,
             document.querySelector('#color-theme'),
             v => {
-                if (v === 'dark') {
-                    switchToDarkTheme();
-                } else {
-                    switchToLightTheme();
-                }
+                (v === 'dark' ? switchToDarkTheme : switchToLightTheme)();
             }
         )
     );
@@ -101,10 +97,7 @@ const start = () => {
     saveCurrentSessionDom.onclick = () => {
         prompt(
             'What would you like to name the session?',
-            {
-                defaultResponse: `Session ${(new Date()).getTime()}`,
-                isModal: true
-            }
+            { isModal: true, defaultResponse: `Session ${(new Date()).getTime()}` }
         ).then(
             sessionName => {
                 chrome.tabs.query(
@@ -115,9 +108,7 @@ const start = () => {
                             .filter(s => s !== 'chrome://newtab/'); // Ignore chrome://newtab
 
                         // Skip if there's no tab to be saved
-                        if (!tabUrlsToSave.length) {
-                            return;
-                        }
+                        if (!tabUrlsToSave.length) { return; }
 
                         // Get current value
                         storedBrowserSessions.get(
@@ -213,18 +204,17 @@ const renderSessionItems = (domElement, items, storedBrowserSessions) => {
     }
 
     // Create DOM string representing items
-    const itemsDomString = parsedItems
+    const itemsDomStrings = parsedItems
         .map(
             ({ name, urls }, i) => {
                 const lengthLabel = urls.length === 1 ? `${urls.length} tab` : `${urls.length} tabs`;
 
                 return `<div class="${ItemTypes.SESSION}" data-index="${i}" title="Restore ${lengthLabel}">${name} - ${lengthLabel}</div>`;
             }
-        )
-        .join('');
+        );
 
     // Assign DOM string to container
-    domElement.innerHTML = itemsDomString;
+    domElement.innerHTML = itemsDomStrings.join('');
 
     // Attach event handlers to restore saved sessions
     domElement.querySelectorAll(`.${ItemTypes.SESSION}`)
@@ -234,12 +224,7 @@ const renderSessionItems = (domElement, items, storedBrowserSessions) => {
                     const itemIndex = +e.target.getAttribute('data-index');
 
                     storedBrowserSessions.get(
-                        value => {
-                            // Determine the selected session
-                            const selectedSession = JSON.parse(value)[itemIndex];
-
-                            restoreSession(selectedSession.urls);
-                        }
+                        value => { restoreSession(JSON.parse(value)[itemIndex].urls); }
                     );
                 };
             }
