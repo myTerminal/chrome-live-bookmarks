@@ -2,6 +2,8 @@
 
 import { storage } from 'chrome-extension-helper';
 import {
+    alert,
+    confirm,
     prompt,
     switchToDarkTheme,
     switchToLightTheme
@@ -43,7 +45,7 @@ const start = () => {
     storage.initializeStorage();
 
     // Create preference property for color-theme
-    const colorThemePreference = storage.createSyncedProperty(
+    const colorThemeProperty = storage.createSyncedProperty(
         'color-theme',
         ColorThemes,
         createDomLoader(
@@ -56,7 +58,7 @@ const start = () => {
     );
 
     // Create preference property for items-layout
-    const itemsLayoutPreference = storage.createSyncedProperty(
+    const itemsLayoutProperty = storage.createSyncedProperty(
         'items-layout',
         ItemsLayouts,
         createDomLoader(
@@ -66,11 +68,11 @@ const start = () => {
     );
 
     // Create preference property for browser-sessions
-    const storedBrowserSessions = storage.createSyncedProperty(
+    const storedSessionsProperty = storage.createSyncedProperty(
         'browser-sessions',
-        ['[]'],
+        [[]],
         value => {
-            renderSessionItems(sessionsDom, value, storedBrowserSessions);
+            renderSessionItems(sessionsDom, value, storedSessionsProperty);
         }
     );
 
@@ -87,10 +89,10 @@ const start = () => {
 
     // Set listeners to toggle preference items
     colorThemeSwitcher.onclick = () => {
-        toggleProperty(colorThemePreference, ColorThemes);
+        toggleProperty(colorThemeProperty, ColorThemes);
     };
     itemsLayoutSwitcher.onclick = () => {
-        toggleProperty(itemsLayoutPreference, ItemsLayouts);
+        toggleProperty(itemsLayoutProperty, ItemsLayouts);
     };
 
     // Attach event to save current session
@@ -111,14 +113,12 @@ const start = () => {
                         if (!tabUrlsToSave.length) { return; }
 
                         // Get current value
-                        storedBrowserSessions.get(
+                        storedSessionsProperty.get(
                             value => {
                                 // Store current session along with previously stored sessions
-                                storedBrowserSessions.set(
-                                    JSON.stringify(
-                                        [{ name: sessionName, urls: tabUrlsToSave }]
-                                            .concat(JSON.parse(value))
-                                    )
+                                storedSessionsProperty.set(
+                                    [{ sessionName, urls: tabUrlsToSave }]
+                                        .concat(value)
                                 );
                             }
                         );
@@ -130,7 +130,14 @@ const start = () => {
 
     // Attach event to clear saved sessions
     clearSavedSessionsDom.onclick = () => {
-        storedBrowserSessions.set('[]');
+        confirm(
+            'Delete all saved sessions?',
+            { isModal: true }
+        ).then(
+            () => {
+                storedSessionsProperty.set([]);
+            }
+        );
     };
 
     // Read bookmarks
@@ -193,9 +200,9 @@ const flattenTree = node =>
         );
 
 // Function to render session items to the supplied Dom element
-const renderSessionItems = (domElement, items, storedBrowserSessions) => {
+const renderSessionItems = (domElement, items, storedSessionsProperty) => {
     // Parse JSON string
-    const parsedItems = JSON.parse(items);
+    const parsedItems = items;
 
     // Quit when the supplied collection is empty
     if (!parsedItems.length) {
@@ -206,10 +213,14 @@ const renderSessionItems = (domElement, items, storedBrowserSessions) => {
     // Create DOM string representing items
     const itemsDomStrings = parsedItems
         .map(
-            ({ name, urls }, i) => {
+            ({ sessionName, urls }, i) => {
                 const lengthLabel = urls.length === 1 ? `${urls.length} tab` : `${urls.length} tabs`;
 
-                return `<div class="${ItemTypes.SESSION}" data-index="${i}" title="Restore ${lengthLabel}">${name} - ${lengthLabel}</div>`;
+                return `<div class="${ItemTypes.SESSION}" data-index="${i}" title="Restore ${lengthLabel}">
+    <span class="session-item-label">${sessionName} - ${lengthLabel}</span>
+    <span class="session-item-rename fas fa-pencil-alt" title="Rename"></span>
+    <span class="session-item-delete fas fa-trash-alt" title="Delete"></span>
+</div>`;
             }
         );
 
@@ -219,16 +230,77 @@ const renderSessionItems = (domElement, items, storedBrowserSessions) => {
     // Attach event handlers to restore saved sessions
     domElement.querySelectorAll(`.${ItemTypes.SESSION}`)
         .forEach(
-            item => {
-                item.onclick = e => {
-                    const itemIndex = +e.target.getAttribute('data-index');
+            (item, index) => {
+                item.onclick = () => { onSessionItemClick(index, storedSessionsProperty); };
 
-                    storedBrowserSessions.get(
-                        value => { restoreSession(JSON.parse(value)[itemIndex].urls); }
-                    );
-                };
+                item.querySelector('.session-item-rename')
+                    .onclick = e => {
+                        e.stopPropagation();
+                        onSessionItemRenameAction(index, storedSessionsProperty);
+                    };
+
+                item.querySelector('.session-item-delete')
+                    .onclick = e => {
+                        e.stopPropagation();
+                        onSessionItemDeleteAction(index, storedSessionsProperty);
+                    };
             }
         );
+};
+
+const onSessionItemClick = (itemIndex, storedSessionsProperty) => {
+    storedSessionsProperty.get(
+        values => { restoreSession(values[itemIndex].urls); }
+    );
+};
+
+const onSessionItemRenameAction = (itemIndex, storedSessionsProperty) => {
+    prompt(
+        'Enter a new name for the session',
+        { isModal: true }
+    ).then(
+        newName => {
+            // Abort rename if no name is provided
+            if (!newName) {
+                alert(
+                    'Session not renamed',
+                    { autoClose: 2000 }
+                );
+
+                return;
+            }
+
+            storedSessionsProperty.get(
+                values => {
+                    storedSessionsProperty.set(
+                        values.map(
+                            (session, i) =>
+                                (i === itemIndex ? { ...session, sessionName: newName } : session)
+                        )
+                    );
+                }
+            );
+        }
+    );
+};
+
+const onSessionItemDeleteAction = (itemIndex, storedSessionsProperty) => {
+    confirm(
+        'Delete the saved session?',
+        { isModal: true }
+    ).then(
+        () => {
+            storedSessionsProperty.get(
+                values => {
+                    storedSessionsProperty.set(
+                        values.filter(
+                            (v, i) => i !== itemIndex
+                        )
+                    );
+                }
+            );
+        }
+    );
 };
 
 const restoreSession = urlsToRestore => {
