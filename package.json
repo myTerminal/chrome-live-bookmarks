@@ -1,6 +1,6 @@
 {
   "name": "chrome-live-bookmarks",
-  "version": "0.16.0",
+  "version": "0.17.0",
   "description": "A smarter New Tab replacement for Google Chrome with easy access to most frequently visited bookmarks",
   "main": "build/index.html",
   "scripts": {
@@ -24,6 +24,7 @@
   "license": "GPL-3.0",
   "dependencies": {
     "@fortawesome/fontawesome-free": "5.8.2",
+    "ample-alerts": "1.3.0",
     "chrome-extension-helper": "0.10.0"
   },
   "devDependencies": {

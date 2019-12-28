@@ -1,6 +1,11 @@
 /* global require process chrome window document */
 
 import { storage } from 'chrome-extension-helper';
+import {
+    prompt,
+    switchToDarkTheme,
+    switchToLightTheme
+} from 'ample-alerts/build/scripts/ample-alerts.promises';
 
 import {
     ItemTypes,
@@ -43,7 +48,14 @@ const start = () => {
         ColorThemes,
         createDomLoader(
             / (light|dark)/,
-            document.querySelector('#color-theme')
+            document.querySelector('#color-theme'),
+            v => {
+                if (v === 'dark') {
+                    switchToDarkTheme();
+                } else {
+                    switchToLightTheme();
+                }
+            }
         )
     );
 
@@ -87,36 +99,37 @@ const start = () => {
 
     // Attach event to save current session
     saveCurrentSessionDom.onclick = () => {
-        // Prompt for a name for the session
-        const sessionName = window.prompt('What would you like to name the session?');
+        prompt(
+            'What would you like to name the session?',
+            {
+                defaultResponse: `Session ${(new Date()).getTime()}`,
+                isModal: true
+            }
+        ).then(
+            sessionName => {
+                chrome.tabs.query(
+                    { currentWindow: true },
+                    tabs => {
+                        // Create an array of tab URLs
+                        const tabUrlsToSave = tabs.map(t => t.url)
+                            .filter(s => s !== 'chrome://newtab/'); // Ignore chrome://newtab
 
-        // If no name is received, abort saving the session
-        if (!sessionName) {
-            return;
-        }
+                        // Skip if there's no tab to be saved
+                        if (!tabUrlsToSave.length) {
+                            return;
+                        }
 
-        // Read stored sessions
-        chrome.tabs.query(
-            { currentWindow: true },
-            tabs => {
-                // Create an array of tab URLs
-                const tabUrlsToSave = tabs.map(t => t.url)
-                    .filter(s => s !== 'chrome://newtab/'); // Ignore chrome://newtab
-
-                // Skip if there's no tab to be saved
-                if (!tabUrlsToSave.length) {
-                    return;
-                }
-
-                // Get current value
-                storedBrowserSessions.get(
-                    value => {
-                        // Store current session along with previously stored sessions
-                        storedBrowserSessions.set(
-                            JSON.stringify(
-                                [{ name: sessionName, urls: tabUrlsToSave }]
-                                    .concat(JSON.parse(value))
-                            )
+                        // Get current value
+                        storedBrowserSessions.get(
+                            value => {
+                                // Store current session along with previously stored sessions
+                                storedBrowserSessions.set(
+                                    JSON.stringify(
+                                        [{ name: sessionName, urls: tabUrlsToSave }]
+                                            .concat(JSON.parse(value))
+                                    )
+                                );
+                            }
                         );
                     }
                 );
@@ -317,12 +330,16 @@ const toggleProperty = (property, values) => {
 };
 
 // Function to load preference labels to DOM
-const createDomLoader = (search, domElement) =>
+const createDomLoader = (search, domElement, onDone) =>
     value => {
         const bodyDom = document.body;
 
         bodyDom.className = `${bodyDom.className.replace(search, '')} ${value}`;
         domElement.innerText = value;
+
+        if (onDone) {
+            onDone(value);
+        }
     };
 
 // Start rendering the page
