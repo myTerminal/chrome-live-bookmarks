@@ -24,6 +24,7 @@ You can install it from the [Chrome Web Store](https://chrome.google.com/webstor
 
 ## To-do
 
+* Implement tracking of "read-later" bookmarks
 * Detect auto-update and inform user about the change
 * Also show bookmarks that are not on the bookmarks bar
 * Add option to modify the list items
