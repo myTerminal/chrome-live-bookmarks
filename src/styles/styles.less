@@ -34,6 +34,7 @@ html {
             top: 0;
             margin-bottom: 10px;
             padding: 5px;
+            height: 40px;
             width: 100%;
             text-align: center;
             z-index: 10;
@@ -41,12 +42,13 @@ html {
 
             #title-text {
                 font-weight: bold;
+                margin-top: 4px;
             }
 
             .title-icon {
                 position: absolute;
                 top: 0;
-                margin: 5px;
+                margin: 10px 10px;
                 cursor: pointer;
                 .opacity(0.7);
 
@@ -69,10 +71,11 @@ html {
         }
 
         .section {
-            margin: 5px 5px 20px 5px;
+            margin: 20px 20px 20px 20px;
 
             .header {
-                margin-bottom: 5px;
+                margin-bottom: 10px;
+                padding-bottom: 10px;
                 font-size: 1.2em;
                 border-bottom: 1px solid;
             }
@@ -82,6 +85,11 @@ html {
                 .bookmark-item,
                 .history-item {
                     cursor: pointer;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                    display: -webkit-box;
+                    -webkit-line-clamp: 2;
+                    -webkit-box-orient: vertical;
 
                     a,
                     a:visited,
@@ -105,11 +113,7 @@ html {
                 }
 
                 .history-item {
-                    .opacity(0.5);
 
-                    &:hover {
-                        .opacity(1);
-                    }
                 }
             }
         }
@@ -178,17 +182,26 @@ html {
 
         #bookmarks-bar {
 
+            .header {
+                margin-top: -10px;
+            }
+
             .items {
 
                 .bookmark-item {
                     display: inline-block;
                     margin: 5px;
-                    padding: 5px;
-                    .round-borders(5px);
+                    padding: 5px 10px;
+                    .round-borders(100px);
 
                     .url {
                         display: none;
                     }
+                }
+
+                .bookmark-item:first-of-type,
+                .history-item:first-of-type {
+                    margin-left: 0px !important;
                 }
             }
         }
@@ -218,6 +231,8 @@ html {
         #all-bookmarks {
 
             .items {
+
+                padding-top: 5px;
 
                 .bookmark-item,
                 .history-item {
@@ -302,6 +317,22 @@ html {
                     .history-item {
 
                     }
+
+                    .history-item {
+                        background-color: #eee;
+
+                        &:hover {
+                            background-color: #ddd;
+                        }
+
+                        .title {
+                            color: #2f2f2f;
+
+                            &:hover {
+                                color: #000;
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -311,7 +342,7 @@ html {
             background-color: #000;
 
             #title {
-                background-color: #444;
+                background-color: #1a237e;
                 color: #fff;
                 border-bottom: 2px solid #666;
 
@@ -333,8 +364,8 @@ html {
                     .bookmark-item,
                     .session-item,
                     .history-item {
-                        background-color: #333;
-                        border: 1px solid #666;
+                        background-color: #311b92;
+                        border: 1px solid #fff;
 
                         a,
                         a:visited,
@@ -344,7 +375,7 @@ html {
                         }
 
                         &:hover {
-                            background-color: #88f;
+                            background-color: #3949ab;
                         }
                     }
                 }
@@ -380,7 +411,22 @@ html {
 
                     .bookmark-item,
                     .history-item {
+                        background-color: #311b9280;
 
+                        &:hover {
+                            background-color: #3949ab;
+                        }
+                    }
+
+                    .history-item {
+
+                        .title {
+                            color: #d0d0d0;
+
+                            &:hover {
+                                color: #fff;
+                            }
+                        }
                     }
                 }
             }
@@ -395,8 +441,8 @@ html {
                     .bookmark-item,
                     .history-item {
                         .box-sizing(border-box);
-                        margin-bottom: 5px;
-                        padding: 5px;
+                        margin-bottom: 10px;
+                        padding: 0.4em 0.7em;
                         .round-borders(2px);
                     }
                 }
@@ -413,7 +459,7 @@ html {
                     .history-item {
                         display: inline-block;
                         margin: 5px;
-                        padding: 5px;
+                        padding: 5px 10px;
                         .round-borders(5px);
 
                         .url {
