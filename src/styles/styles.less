@@ -84,6 +84,11 @@ html {
                 .bookmark-item,
                 .history-item {
                     cursor: pointer;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                    display: -webkit-box;
+                    -webkit-line-clamp: 2;
+                    -webkit-box-orient: vertical;
 
                     a,
                     a:visited,
