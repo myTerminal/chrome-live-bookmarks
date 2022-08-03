@@ -4,9 +4,6 @@
 [![Code Climate](https://codeclimate.com/github/myTerminal/chrome-live-bookmarks.png)](https://codeclimate.com/github/myTerminal/chrome-live-bookmarks)
 [![js-myterminal-style](https://img.shields.io/badge/code%20style-myterminal-blue.svg)](https://www.npmjs.com/package/eslint-config/myterminal)
 [![Coverage Status](https://img.shields.io/coveralls/myTerminal/chrome-live-bookmarks.svg)](https://coveralls.io/r/myTerminal/chrome-live-bookmarks?branch=master)  
-[![Dependency Status](https://david-dm.org/myTerminal/chrome-live-bookmarks.svg)](https://david-dm.org/myTerminal/chrome-live-bookmarks)
-[![devDependency Status](https://david-dm.org/myTerminal/chrome-live-bookmarks/dev-status.svg)](https://david-dm.org/myTerminal/chrome-live-bookmarks#info=devDependencies)
-[![peer Dependency Status](https://david-dm.org/myTerminal/chrome-live-bookmarks/peer-status.svg)](https://david-dm.org/myTerminal/chrome-live-bookmarks#info=peerDependencies)  
 [![License](https://img.shields.io/badge/LICENSE-GPL%20v3.0-blue.svg)](https://www.gnu.org/licenses/gpl.html)
 
 A smarter New Tab replacement for Google Chrome with easy access to most frequently visited bookmarks
