@@ -1,6 +1,6 @@
 {
   "name": "chrome-live-bookmarks",
-  "version": "0.18.0",
+  "version": "0.19.0",
   "description": "A smarter New Tab replacement for Google Chrome with easy access to most frequently visited bookmarks",
   "main": "build/index.html",
   "scripts": {
