@@ -3,7 +3,6 @@
   "name": "Chrome Live Bookmarks",
   "short_name": "Chrome Live Bookmarks",
   "version": "#version#",
-  "default_locale": "en",
   "description": "#description#",
   "icons": {
     "16": "icons/icon16.png",
